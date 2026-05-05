@@ -59,27 +59,21 @@ public class AdminService : IAdminService
         var template = await _db.PermissionTemplates.FindAsync(templateId)
             ?? throw new KeyNotFoundException($"Template {templateId} not found.");
 
-        foreach (var vp in template.ViewPermissions)
+        admin.ViewPermissions = template.ViewPermissions.Select(vp => new ViewPermissionEntry
         {
-            admin.ViewPermissions.Add(new ViewPermissionEntry
-            {
-                ServiceType = vp.ServiceType,
-                AllowedStatuses = vp.AllowedStatuses?.ToList(),
-                AllowedGovernorates = vp.AllowedGovernorates?.ToList(),
-                AllowedTargets = vp.AllowedTargets?.ToList()
-            });
-        }
+            ServiceType = vp.ServiceType,
+            AllowedStatuses = vp.AllowedStatuses?.ToList(),
+            AllowedGovernorates = vp.AllowedGovernorates?.ToList(),
+            AllowedTargets = vp.AllowedTargets?.ToList()
+        }).ToList();
 
-        foreach (var ap in template.ActionPermissions)
+        admin.ActionPermissions = template.ActionPermissions.Select(ap => new ActionPermissionEntry
         {
-            admin.ActionPermissions.Add(new ActionPermissionEntry
-            {
-                ServiceType = ap.ServiceType,
-                Actions = ap.Actions.ToList(),
-                AllowedGovernorates = ap.AllowedGovernorates?.ToList(),
-                AllowedTargets = ap.AllowedTargets?.ToList()
-            });
-        }
+            ServiceType = ap.ServiceType,
+            Actions = ap.Actions.ToList(),
+            AllowedGovernorates = ap.AllowedGovernorates?.ToList(),
+            AllowedTargets = ap.AllowedTargets?.ToList()
+        }).ToList();
 
         await _db.SaveChangesAsync();
         return ToDto(admin);

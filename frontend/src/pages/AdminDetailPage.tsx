@@ -99,7 +99,7 @@ export default function AdminDetailPage() {
                   }
                 >
                   <Typography.Text type="secondary">
-                    Applying a template appends its permission entries to the admin's current permissions.
+                    Applying a template replaces all current permissions with the template's permissions.
                   </Typography.Text>
                 </Card>
 
