@@ -2,7 +2,7 @@ import { Button, Card, Col, Form, Row, Select, Space, Tabs, Tag, Typography, mes
 import { ArrowLeftOutlined, SaveOutlined, ThunderboltOutlined } from '@ant-design/icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
-import { applyTemplate, getAdminPermissions, updateAdminPermissions } from '../api/adminsApi';
+import { getAdminPermissions, updateAdminPermissions } from '../api/adminsApi';
 import { getTemplates } from '../api/templatesApi';
 import { checkPermission } from '../api/permissionsApi';
 import PermissionEntryForm from '../components/permissions/PermissionEntryForm';
@@ -40,14 +40,14 @@ export default function AdminDetailPage() {
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['admin', adminId] }); message.success('Permissions saved.'); },
   });
 
-  const applyMutation = useMutation({
-    mutationFn: (templateId: number) => applyTemplate(adminId, templateId),
-    onSuccess: (data) => {
-      qc.setQueryData(['admin', adminId], data);
-      permForm.setFieldsValue({ viewPermissions: data.viewPermissions, actionPermissions: data.actionPermissions });
-      message.success('Template applied — entries added to admin permissions.');
-    },
-  });
+  const handleTemplateSelect = (templateId: number) => {
+    const template = templates.find((t) => t.id === templateId);
+    if (!template) return;
+    permForm.setFieldsValue({
+      viewPermissions: template.viewPermissions,
+      actionPermissions: template.actionPermissions,
+    });
+  };
 
   const handleCheck = async (values: any) => {
     const res = await checkPermission({
@@ -86,20 +86,20 @@ export default function AdminDetailPage() {
             children: (
               <Form form={permForm} initialValues={initialValues} onFinish={(v) => saveMutation.mutate(v)} layout="vertical">
                 <Card
-                  title="Apply Template"
+                  title="Load from Template"
                   size="small"
                   style={{ marginBottom: 16 }}
                   extra={
                     <Select
                       style={{ width: 280 }}
-                      placeholder="Select a template to apply..."
+                      placeholder="Select a template..."
                       options={templates.map((t) => ({ value: t.id, label: t.name }))}
-                      onChange={(templateId) => applyMutation.mutate(templateId)}
+                      onChange={handleTemplateSelect}
                     />
                   }
                 >
                   <Typography.Text type="secondary">
-                    Applying a template replaces all current permissions with the template's permissions.
+                    Selecting a template loads its permissions into the form below. Nothing is saved until you click Save Permissions.
                   </Typography.Text>
                 </Card>
 
