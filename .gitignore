@@ -1,0 +1,16 @@
+# Backend
+backend/PermissionManagement.API/bin/
+backend/PermissionManagement.API/obj/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
+# Env / secrets
+.env
+.env.local
+appsettings.Development.json
+
+# OS
+.DS_Store
+Thumbs.db
